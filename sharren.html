@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en" id="top">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>#ReadyTogetherCDO – Disaster Preparedness & Resilience</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Source+Sans+Pro&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #1E88E5;
+      --green: #2E7D32;
+      --yellow: #F9A825;
+      --charcoal: #37474F;
+      --light: #F5F7FA;
+      --red: #E53935;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Source Sans Pro', sans-serif; background: var(--light); color: var(--charcoal); }
+    header {
+      background: url('media/banner.jpg') center/cover no-repeat, linear-gradient(135deg, var(--blue), var(--green));
+      color: white; text-align: center; padding: 60px 20px;
+    }
+    header h1 { font-family: 'Montserrat', sans-serif; font-size: 2.2rem; margin: 0; }
+    .tagline { font-size: 1.1rem; margin-top: 10px; }
+
+    nav {
+      background: white; border-bottom: 1px solid #ddd;
+      display: flex; flex-wrap: wrap; justify-content: center;
+      position: sticky; top: 0; z-index: 999;
+    }
+    nav a {
+      padding: 12px 16px; color: var(--blue); font-weight: 600;
+      text-decoration: none; transition: background 0.2s;
+    }
+    nav a:hover, nav a.active { background: #eef6fd; border-radius: 6px; }
+
+    .container { max-width: 1100px; margin: auto; padding: 20px; }
+
+    /* Section transitions */
+    main section {
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      display: none; background: white; margin-bottom: 20px; padding: 20px;
+      border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    main section.active { display: block; opacity: 1; transform: translateY(0); }
+
+    h2 { font-family: 'Montserrat', sans-serif; color: var(--blue); }
+    .cta {
+      display: inline-block; background: var(--yellow); color: #111;
+      padding: 10px 16px; border-radius: 8px; font-weight: bold;
+      margin-top: 10px; text-decoration: none; cursor: pointer;
+    }
+    .cta:hover { filter: brightness(1.1); }
+
+    footer { text-align: center; padding: 20px; background: #eee; font-size: 0.9rem; color: #555; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.6rem; }
+      .tagline { font-size: 1rem; }
+    }
+
+    /* Bars for charts */
+    .bar { height: 20px; border-radius: 4px; transition: width 0.5s ease; background: #ddd; }
+    #bar-correct { background: var(--green); }
+    #bar-incorrect { background: var(--red); }
+
+    #backToTop {
+      position: fixed; bottom: 20px; right: 20px;
+      background: var(--blue); color: white;
+      padding: 10px 14px; border-radius: 50px;
+      font-weight: bold; text-decoration: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    /* Loader spinner */
+    .loader {
+      border: 4px solid #f3f3f3; border-top: 4px solid var(--blue);
+      border-radius: 50%; width: 24px; height: 24px;
+      animation: spin 1s linear infinite; display: inline-block;
+      vertical-align: middle; margin-left: 8px;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* Progress bar */
+    .progress-container { width: 100%; background: #ddd; border-radius: 6px; margin-top: 10px; height: 8px; overflow: hidden; }
+    .progress-bar { height: 100%; width: 0%; background: var(--blue); transition: width 0.8s linear; }
+
+    /* Fade-in utility */
+    .fade-in { opacity: 0; transition: opacity 0.6s ease-in; }
+    .fade-in.show { opacity: 1; }
+
+    /* Modal overlay */
+    .modal {
+      display: none; position: fixed; z-index: 1000; left: 0; top: 0;
+      width: 100%; height: 100%; background: rgba(0,0,0,0.6);
+      justify-content: center; align-items: center; padding: 20px;
+    }
+    .modal-content {
+      background: white; padding: 20px; border-radius: 10px; max-width: 700px; width: 100%;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3); animation: modalIn 0.25s ease;
+      max-height: 85vh; overflow-y: auto;
+    }
+    .modal-close {
+      float: right; font-size: 1.6rem; font-weight: bold; cursor: pointer; color: var(--red); line-height: 1;
+    }
+    @keyframes modalIn { from { opacity: 0; transform: translateY(8px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+    .media-box { background:#000; aspect-ratio:16/9; border-radius:8px; display:grid; place-items:center; color:#fff; }
+
+    /* Quiz feedback label */
+    .feedback { margin-left: 8px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>#ReadyTogetherCDO</h1>
+    <p class="tagline">Ready Today, Resilient Tomorrow</p>
+    <a href="#challenge" class="cta" id="challengeCta">Join the 5-Day Challenge</a>
+  </header>
+
+  <nav>
+    <a href="#print">📄 Print</a>
+    <a href="#audio">🎧 Audio</a>
+    <a href="#video">🎥 Video</a>
+    <a href="#quiz">🧠 Quiz</a>
+    <a href="#schedule">📅 Schedule</a>
+    <a href="#social">📱 Social</a>
+    <a href="#polls">📊 Polls</a>
+  </nav>
+
+  <main class="container">
+    <section id="print">
+      <h2>📄 Print Toolkit</h2>
+      <p>Download the tri-fold brochure and infographic poster. Scan the QR code to access resources.</p>
+      <a class="cta" href="#">Download Brochure</a>
+      <a class="cta" href="#">Download Poster</a>
+
+      <hr style="margin:30px 0; border:none; border-top:1px solid #ccc;">
+
+      <h3 style="color:#37474F;">🎯 Featured Posters</h3>
+      <div id="poster-carousel" style="position:relative; max-width:600px; margin:auto;">
+        <img id="carousel-image" src="style.png" alt="Flyer – 5-Day Challenge" style="width:100%; border-radius:10px; box-shadow:0 4px 12px rgba(0,0,0,0.1);" />
+        <div style="text-align:center; margin-top:10px;">
+          <button onclick="showPoster(0)" class="cta">Brochure</button>
+          <button onclick="showPoster(1)" class="cta">Poster</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="challenge">
+      <h2>🚀 5-Day Challenge</h2>
+      <ul style="line-height:1.8;">
+        <li><strong>Day 1:</strong> Pack your emergency kit</li>
+        <li><strong>Day 2:</strong> Secure important documents</li>
+        <li><strong>Day 3:</strong> Verify site exits</li>
+        <li><strong>Day 4:</strong> Practice Drop, Cover, Hold</li>
+        <li><strong>Day 5:</strong> Join the community poll</li>
+      </ul>
+    </section>
+
+    <section id="schedule">
+      <h2>📅 December 5, 2025 Post Schedule</h2>
+      <ul>
+        <li>Instagram: Tue/Thu/Sun – 7pm/4pm</li>
+        <li>Facebook: Mon/Wed/Fri/Sat – 6pm/10am</li>
+        <li>TikTok: Wed/Sat – 8pm/5pm</li>
+        <li>X (Twitter): Daily – 12pm/6pm</li>
+        <li>YouTube: Fri – 8pm</li>
+      </ul>
+    </section>
+
+    <section id="social">
+      <h2>📱 Social Media Mock-up</h2>
+      <div class="grid">
+        <div style="background:#fafafa; border:1px solid #eee; border-radius:8px; padding:16px;">
+          <strong>Instagram Carousel</strong><br>
+          Teaser + Checklist + CTA
+        </div>
+        <div style="background:#fafafa; border:1px solid #eee; border-radius:8px; padding:16px;">
+          <strong>Facebook Carousel</strong><br>
+          Short story + link to challenge
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Audio Modal -->
+  <div id="audioModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeModal('audioModal')" aria-label="Close audio modal">&times;</span>
+      <h2>🎧 Audio PSA</h2>
+      <audio controls style="width:100%">
+        <source src="podcast.mp3" type="audio/mpeg" />
+      </audio>
+    </div>
+  </div>
+
+  <!-- Video Modal -->
+  <div id="videoModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeModal('videoModal')" aria-label="Close video modal">&times;</span>
+      <h2>🎥 Video Storyteller</h2>
+      <div class="media-box">
+      <video controls style="width:100%">
+      <source src="video.mp4" type="video/mp4">
+      </video>
+      </div>
+      
+      <!-- Example: <iframe width="560" height="315" src="https://www.youtube.com/embed/VIDEO_ID" ... ></iframe> -->
+    </div>
+  </div>
+
+  <!-- Quiz Modal (cleaned: no nested duplicates) -->
+  <div id="quizModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeModal('quizModal')" aria-label="Close quiz modal">&times;</span>
+      <h2>🧠 Quick Quiz</h2>
+
+      <form id="quiz-form">
+        <p>Q1: Best action during earthquake shaking?</p>
+        <label><input type="radio" name="q1" value="drop"> Drop, Cover, Hold</label><span class="feedback" id="fb-q1"></span><br/>
+        <label><input type="radio" name="q1" value="run"> Run outside immediately</label><br/>
+
+        <p>Q2: Where should you store your emergency kit?</p>
+        <label><input type="radio" name="q2" value="exit"> Near the exit</label><span class="feedback" id="fb-q2"></span><br/>
+        <label><input type="radio" name="q2" value="deep"> Deep storage</label><br/>
+
+        <p>Q3: What is the most important item to include in your kit?</p>
+        <label><input type="radio" name="q3" value="water"> Water</label><span class="feedback" id="fb-q3"></span><br/>
+        <label><input type="radio" name="q3" value="toys"> Toys</label><br/>
+
+        <p>Q4: During a fire, what should you do first?</p>
+        <label><input type="radio" name="q4" value="exit"> Find the nearest exit</label><span class="feedback" id="fb-q4"></span><br/>
+        <label><input type="radio" name="q4" value="hide"> Hide under the bed</label><br/>
+
+        <p>Q5: How often should you check your emergency kit?</p>
+        <label><input type="radio" name="q5" value="yearly"> Once a year</label><br/>
+        <label><input type="radio" name="q5" value="monthly"> Every month</label><span class="feedback" id="fb-q5"></span><br/>
+
+        <p>Q6: What’s the safest place during a typhoon?</p>
+        <label><input type="radio" name="q6" value="indoors"> Indoors away from windows</label><span class="feedback" id="fb-q6"></span><br/>
+        <label><input type="radio" name="q6" value="outside"> Outside to watch</label><br/>
+
+        <p>Q7: Why is it important to secure documents?</p>
+        <label><input type="radio" name="q7" value="proof"> For identification and recovery</label><span class="feedback" id="fb-q7"></span><br/>
+        <label><input type="radio" name="q7" value="fun"> For fun</label><br/>
+
+        <button type="submit" class="cta">Check Answers</button>
+      </form>
+
+      <div id="quiz-result" style="margin-top:10px;"></div>
+
+      <button id="resetQuiz" class="cta" style="margin-top:10px;">Reset Quiz</button>
+      <button id="downloadScore" class="cta" style="margin-top:10px;">Download My Score</button>
+
+      <div id="quiz-chart" style="margin-top:20px;">
+        <div style="margin-bottom:8px;">Correct: <div id="bar-correct" class="bar" style="width:0%;"></div></div>
+        <div style="margin-bottom:8px;">Incorrect: <div id="bar-incorrect" class="bar" style="width:0%;"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Polls Modal -->
+  <div id="pollsModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeModal('pollsModal')" aria-label="Close polls modal">&times;</span>
+      <h2>📊 Community Polls</h2>
+
+      <!-- Emergency Kit Poll -->
+      <form id="poll-kit">
+        <p>Do you already have a complete emergency kit at home?</p>
+        <label><input type="radio" name="kit" value="Yes"> Yes</label><br/>
+        <label><input type="radio" name="kit" value="Partially"> Partially</label><br/>
+        <label><input type="radio" name="kit" value="Not yet"> Not yet</label><br/>
+        <button type="submit" class="cta">Submit</button>
+      </form>
+      <div id="poll-kit-result"></div>
+      <div id="poll-kit-chart" style="margin-top:20px;">
+        <div>Yes: <div class="bar" data-value="Yes" style="width:0%; background:#1E88E5;"></div></div>
+        <div>Partially: <div class="bar" data-value="Partially" style="width:0%; background:#F9A825;"></div></div>
+        <div>Not yet: <div class="bar" data-value="Not yet" style="width:0%; background:#2E7D32;"></div></div>
+      </div>
+
+      <hr style="margin:24px 0; border:none; border-top:1px solid #eee;">
+
+      <!-- Essential Item Poll -->
+      <form id="poll-item">
+        <p>Which item do you think is most essential in an emergency kit?</p>
+        <label><input type="radio" name="item" value="Water"> Water</label><br/>
+        <label><input type="radio" name="item" value="First aid"> First aid</label><br/>
+        <label><input type="radio" name="item" value="Flashlight"> Flashlight</label><br/>
+        <label><input type="radio" name="item" value="Documents"> Important documents</label><br/>
+        <button type="submit" class="cta">Submit</button>
+      </form>
+      <div id="poll-item-result"></div>
+      <div id="poll-item-chart" style="margin-top:20px;">
+        <div>Water: <div class="bar" data-value="Water" style="width:0%; background:#1E88E5;"></div></div>
+        <div>First aid: <div class="bar" data-value="First aid" style="width:0%; background:#2E7D32;"></div></div>
+        <div>Flashlight: <div class="bar" data-value="Flashlight" style="width:0%; background:#F9A825;"></div></div>
+        <div>Documents: <div class="bar" data-value="Documents" style="width:0%; background:#E53935;"></div></div>
+      </div>
+
+      <hr style="margin:24px 0; border:none; border-top:1px solid #eee;">
+
+      <!-- Confidence Poll -->
+      <form id="poll-confidence">
+        <p>How confident are you in practicing “Drop, Cover, Hold” during an earthquake?</p>
+        <label><input type="radio" name="confidence" value="Very confident"> Very confident</label><br/>
+        <label><input type="radio" name="confidence" value="Somewhat confident"> Somewhat confident</label><br/>
+        <label><input type="radio" name="confidence" value="Not confident"> Not confident</label><br/>
+        <button type="submit" class="cta">Submit</button>
+      </form>
+      <div id="poll-confidence-result"></div>
+      <div id="poll-confidence-chart" style="margin-top:20px;">
+        <div>Very confident: <div class="bar" data-value="Very confident" style="width:0%; background:#1E88E5;"></div></div>
+        <div>Somewhat confident: <div class="bar" data-value="Somewhat confident" style="width:0%; background:#F9A825;"></div></div>
+        <div>Not confident: <div class="bar" data-value="Not confident" style="width:0%; background:#E53935;"></div></div>
+      </div>
+
+      <hr style="margin:24px 0; border:none; border-top:1px solid #eee;">
+
+      <!-- Kit Location Poll -->
+      <form id="poll-location">
+        <p>Where do you usually keep your emergency kit?</p>
+        <label><input type="radio" name="location" value="Exit"> Near the exit</label><br/>
+        <label><input type="radio" name="location" value="Bedroom"> Bedroom</label><br/>
+        <label><input type="radio" name="location" value="Living room"> Living room</label><br/>
+        <label><input type="radio" name="location" value="Other"> Other</label><br/>
+        <button type="submit" class="cta">Submit</button>
+      </form>
+      <div id="poll-location-result"></div>
+      <div id="poll-location-chart" style="margin-top:20px;">
+        <div>Exit: <div class="bar" data-value="Exit" style="width:0%; background:#1E88E5;"></div></div>
+        <div>Bedroom: <div class="bar" data-value="Bedroom" style="width:0%; background:#2E7D32;"></div></div>
+        <div>Living room: <div class="bar" data-value="Living room" style="width:0%; background:#F9A825;"></div></div>
+        <div>Other: <div class="bar" data-value="Other" style="width:0%; background:#E53935;"></div></div>
+      </div>
+
+      <hr style="margin:24px 0; border:none; border-top:1px solid #eee;">
+
+      <!-- Drill Participation Poll -->
+      <form id="poll-drill">
+        <p>Would you join a community disaster drill if invited?</p>
+        <label><input type="radio" name="drill" value="Yes"> Yes</label><br/>
+        <label><input type="radio" name="drill" value="Maybe"> Maybe</label><br/>
+        <label><input type="radio" name="drill" value="No"> No</label><br/>
+        <button type="submit" class="cta">Submit</button>
+      </form>
+      <div id="poll-drill-result"></div>
+      <div id="poll-drill-chart" style="margin-top:20px;">
+        <div>Yes: <div class="bar" data-value="Yes" style="width:0%; background:#1E88E5;"></div></div>
+        <div>Maybe: <div class="bar" data-value="Maybe" style="width:0%; background:#F9A825;"></div></div>
+        <div>No: <div class="bar" data-value="No" style="width:0%; background:#E53935;"></div></div>
+      </div>
+
+      <hr style="margin:24px 0; border:none; border-top:1px solid #eee;">
+
+      <!-- Platform Poll -->
+      <form id="poll-platform">
+        <p>Which platform helps you most in learning preparedness tips?</p>
+        <label><input type="radio" name="platform" value="Facebook"> Facebook</label><br/>
+        <label><input type="radio" name="platform" value="TikTok"> TikTok</label><br/>
+        <label><input type="radio" name="platform" value="YouTube"> YouTube</label><br/>
+        <label><input type="radio" name="platform" value="School"> School</label><br/>
+        <button type="submit" class="cta">Submit</button>
+      </form>
+      <div id="poll-platform-result"></div>
+      <div id="poll-platform-chart" style="margin-top:20px;">
+        <div>Facebook: <div class="bar" data-value="Facebook" style="width:0%; background:#1E88E5;"></div></div>
+        <div>TikTok: <div class="bar" data-value="TikTok" style="width:0%; background:#F9A825;"></div></div>
+        <div>YouTube: <div class="bar" data-value="YouTube" style="width:0%; background:#2E7D32;"></div></div>
+        <div>School: <div class="bar" data-value="School" style="width:0%; background:#E53935;"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <a id="backToTop" href="#top">Back to top</a>
+
+  <footer>
+    #ReadyTogetherCDO — Ready Today, Resilient Tomorrow
+  </footer>
+
+  <script>
+    // Speak aloud helper
+    function speak(text) {
+      try {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = "en-US";
+        speechSynthesis.speak(utterance);
+      } catch (e) { /* no-op */ }
+    }
+
+    // Poster carousel
+    const posters = [
+      { src: "style.png", alt: "Flyer – 5-Day Challenge" },
+      { src: "poster.png", alt: "Emergency Response Course Poster" }
+    ];
+    function showPoster(index) {
+      const img = document.getElementById("carousel-image");
+      if (!img) return;
+      img.src = posters[index].src;
+      img.alt = posters[index].alt;
+    }
+
+    // Section nav handling (fade-in between sections)
+    const navLinks = document.querySelectorAll("nav a");
+    const sections = document.querySelectorAll("main section");
+    const modalMap = {
+      audio: "audioModal",
+      video: "videoModal",
+      quiz: "quizModal",
+      polls: "pollsModal"
+    };
+
+    function activateSection(id) {
+      sections.forEach(sec => sec.classList.remove("active"));
+      navLinks.forEach(l => l.classList.remove("active"));
+      const target = document.getElementById(id);
+      if (target) target.classList.add("active");
+      const link = document.querySelector(`nav a[href="#${id}"]`);
+      if (link) link.classList.add("active");
+      document.querySelector("main").scrollIntoView({ behavior: "smooth" });
+    }
+
+    navLinks.forEach(link => {
+      link.addEventListener("click", e => {
+        e.preventDefault();
+        const targetId = link.getAttribute("href").substring(1);
+        if (modalMap[targetId]) {
+          openModal(modalMap[targetId]);
+          navLinks.forEach(l => l.classList.remove("active"));
+          link.classList.add("active");
+        } else {
+          activateSection(targetId);
+        }
+      });
+    });
+
+    // Challenge CTA behavior (activates section)
+    document.getElementById("challengeCta").addEventListener("click", e => {
+      e.preventDefault();
+      activateSection("challenge");
+    });
+
+    // Show the first section by default
+    activateSection("print");
+
+    // Modal controls
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      if (!modal) return;
+      modal.style.display = "flex";
+      modal.setAttribute("aria-hidden", "false");
+      modal.addEventListener("click", function overlayClose(evt) {
+        if (evt.target === modal) {
+          closeModal(id);
+          modal.removeEventListener("click", overlayClose);
+        }
+      });
+      function escClose(evt) {
+        if (evt.key === "Escape") {
+          closeModal(id);
+          document.removeEventListener("keydown", escClose);
+        }
+      }
+      document.addEventListener("keydown", escClose);
+    }
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      if (!modal) return;
+      modal.style.display = "none";
+      modal.setAttribute("aria-hidden", "true");
+    }
+
+    // Utility: loader + result (available if needed)
+    function showLoader(targetId) {
+      const target = document.getElementById(targetId);
+      if (!target) return;
+      target.innerHTML = `
+        Processing <span class="loader"></span>
+        <div class="progress-container">
+          <div class="progress-bar" id="${targetId}-bar"></div>
+        </div>`;
+      setTimeout(() => {
+        const bar = document.getElementById(`${targetId}-bar`);
+        if (bar) bar.style.width = "100%";
+      }, 50);
+    }
+    function showResult(targetId, message, isSuccess=true) {
+      const resultDiv = document.getElementById(targetId);
+      if (!resultDiv) return;
+      resultDiv.className = 'fade-in show';
+      const icon = isSuccess ? '✔' : '✖';
+      resultDiv.textContent = `${message} ${icon}`;
+      speak(message);
+    }
+
+    // Polls logic: unified multi-poll setup
+    function setupPoll(formId, resultId, chartId) {
+      const form = document.getElementById(formId);
+      if (!form) return;
+
+      const radios = [...form.querySelectorAll("input[type=radio]")];
+      const options = radios.map(r => r.value);
+
+      const counts = {};
+      options.forEach(o => counts[o] = 0);
+      let total = 0;
+
+      function updateChart() {
+        if (!total) return;
+        options.forEach(opt => {
+          const bar = document.querySelector(`#${chartId} .bar[data-value="${opt}"]`);
+          if (bar) bar.style.width = (counts[opt] / total * 100) + "%";
+        });
+      }
+
+      form.addEventListener("submit", e => {
+        e.preventDefault();
+        const groupName = radios[0]?.name;
+        const formData = new FormData(form);
+        const choice = formData.get(groupName);
+        if (!choice) {
+          const resultDiv = document.getElementById(resultId);
+          if (resultDiv) resultDiv.textContent = "Please select an option.";
+          return;
+        }
+        counts[choice]++;
+        total++;
+        const resultDiv = document.getElementById(resultId);
+        if (resultDiv) resultDiv.textContent = `You voted: ${choice}`;
+        updateChart();
+      });
+    }
+
+    // Initialize all polls
+    setupPoll("poll-kit", "poll-kit-result", "poll-kit-chart");
+    setupPoll("poll-item", "poll-item-result", "poll-item-chart");
+    setupPoll("poll-confidence", "poll-confidence-result", "poll-confidence-chart");
+    setupPoll("poll-location", "poll-location-result", "poll-location-chart");
+    setupPoll("poll-drill", "poll-drill-result", "poll-drill-chart");
+    setupPoll("poll-platform", "poll-platform-result", "poll-platform-chart");
+
+    // -----------------------
+    // Fixed + Enhanced Quiz
+    // -----------------------
+    let quizCorrect = 0;
+    let quizIncorrect = 0;
+    let quizAttempts = 0;
+
+    function updateQuizChart() {
+      const totalQuestions = 7;
+      if (quizAttempts === 0) {
+        document.getElementById("bar-correct").style.width = "0%";
+        document.getElementById("bar-incorrect").style.width = "0%";
+        return;
+      }
+      const correctPercent = (quizCorrect / (quizAttempts * totalQuestions)) * 100;
+      const incorrectPercent = 100 - correctPercent;
+      document.getElementById("bar-correct").style.width = correctPercent + "%";
+      document.getElementById("bar-incorrect").style.width = incorrectPercent + "%";
+    }
+
+    const quizForm = document.getElementById('quiz-form');
+    if (quizForm) {
+      quizForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const fd = new FormData(e.target);
+
+        const answers = {
+          q1: 'drop',
+          q2: 'exit',
+          q3: 'water',
+          q4: 'exit',
+          q5: 'monthly',
+          q6: 'indoors',
+          q7: 'proof'
+        };
+
+        let score = 0;
+        Object.keys(answers).forEach(q => {
+          const userAnswer = fd.get(q);
+          const fb = document.getElementById(`fb-${q}`);
+          if (userAnswer === answers[q]) {
+            score++;
+            if (fb) fb.textContent = "✅ Correct!";
+          } else {
+            if (fb) fb.textContent = "❌ Try again.";
+          }
+        });
+
+        quizAttempts++;
+        quizCorrect += score;
+        quizIncorrect += (Object.keys(answers).length - score);
+
+        const result = `Score: ${score}/7 — ${score === 7 ? "Perfect! Share your score with #ReadyTogetherCDO." : "Keep practicing, you’re getting better!"}`;
+        document.getElementById('quiz-result').textContent = result;
+        speak(result);
+        updateQuizChart();
+      });
+    }
+
+    // Reset button
+    const resetBtn = document.getElementById("resetQuiz");
+    if (resetBtn) {
+      resetBtn.addEventListener("click", () => {
+        quizCorrect = 0;
+        quizIncorrect = 0;
+        quizAttempts = 0;
+        document.getElementById("quiz-result").textContent = "";
+        document.querySelectorAll(".feedback").forEach(fb => fb.textContent = "");
+        if (quizForm) quizForm.reset();
+        updateQuizChart();
+      });
+    }
+
+    // Download score
+    const downloadBtn = document.getElementById("downloadScore");
+    if (downloadBtn) {
+      downloadBtn.addEventListener("click", () => {
+        const scoreText = `#ReadyTogetherCDO Quiz\nAttempts: ${quizAttempts}\nCorrect answers (total): ${quizCorrect}\nIncorrect answers (total): ${quizIncorrect}\n`;
+        const blob = new Blob([scoreText], { type: "text/plain" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "quiz_score.txt";
+        link.click();
+      });
+    }
+    
+    <script>
+    function openModal(id) {
+    document.getElementById(id).setAttribute("aria-hidden", "false");
+    }
+    
+    function closeModal() {
+    document.querySelectorAll('.modal').forEach(modal => {
+    modal.setAttribute("aria-hidden", "true");
+    });
+    }
+  </script>
+</body>
+</html>
+>/html>
+>
